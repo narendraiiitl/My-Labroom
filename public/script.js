@@ -1,5 +1,24 @@
 const preload = document.getElementById("prewrapper");
 const attend=document.getElementById('lpresence');
+const Sub=document.getElementById('lsubject');
+let currentsubject;
+$.ajax({
+  url: 'http://localhost:3000/api/currentsubject',
+  type: 'GET',
+  dataType: 'json',
+  beforeSend: setHeader
+})
+.then(showsubject)
+.catch(function(err){
+  console.log(err)
+})
+function setHeader(xhr) {
+xhr.setRequestHeader('subject_id', ROOM_ID);
+}
+function showsubject(subject) {
+  currentsubject=subject;
+  Sub.innerText = subject.name
+}
 window.addEventListener("DOMContentLoaded", function () {
   setTimeout(function () {
     preload.style.display = "none";
@@ -96,20 +115,22 @@ let p=0;
         if (result[0].label == "narendra")
         {
           p=p+1;
-          if (p == 200) {
+          if (p == 20) {
             // console.log(result[0].label);
+            attend.innerText = 'PRESENT'
          axios({
               method: 'post',
               url: 'http://localhost:3000/api/markattendence',
-              data: {  id:token
+              data: {  id:token,
+                  subject:currentsubject,
               },
               headers: {'Content-Type': 'application/json;charset=utf-8','authorization':`Bearer ${token}` }
           })
           .then(function (response) {
-              console.log(response);
+            attend.innerText = 'PRESENT'
           })
           .catch(function (error) {
-              console.log(error);
+            attend.innerText = 'PENDING'
           });
           }
         }
@@ -137,25 +158,7 @@ let p=0;
 
 
 
-  $.ajax({
-  url: 'http://localhost:3000/api/currentsubject',
-  type: 'GET',
-  dataType: 'json',
-  beforeSend: setHeader
-})
-.then(showsubject)
-.catch(function(err){
-  console.log(err)
-})
-function setHeader(xhr) {
-xhr.setRequestHeader('subject_id', ROOM_ID);
-}
-const Sub=document.getElementById('lsubject');
-function showsubject(subject) {
-  console.log(subject);
-  console.log(subject.name);
-  Sub.innerText = subject.name
-}
+
 
   $.ajax({
   url: 'http://localhost:3000/api/username',
