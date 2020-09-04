@@ -1,4 +1,5 @@
 const preload = document.getElementById("prewrapper");
+const attend=document.getElementById('lpresence');
 window.addEventListener("DOMContentLoaded", function () {
   setTimeout(function () {
     preload.style.display = "none";
@@ -94,10 +95,9 @@ let p=0;
         );
         if (result[0].label == "narendra")
         {
-          console.log(p);
           p=p+1;
           if (p == 200) {
-            console.log(result[0].label);
+            // console.log(result[0].label);
          axios({
               method: 'post',
               url: 'http://localhost:3000/api/markattendence',
@@ -134,3 +134,45 @@ let p=0;
       })
     );
   }
+
+
+
+  $.ajax({
+  url: 'http://localhost:3000/api/currentsubject',
+  type: 'GET',
+  dataType: 'json',
+  beforeSend: setHeader
+})
+.then(showsubject)
+.catch(function(err){
+  console.log(err)
+})
+function setHeader(xhr) {
+xhr.setRequestHeader('subject_id', ROOM_ID);
+}
+const Sub=document.getElementById('lsubject');
+function showsubject(subject) {
+  console.log(subject);
+  console.log(subject.name);
+  Sub.innerText = subject.name
+}
+
+  $.ajax({
+  url: 'http://localhost:3000/api/username',
+  type: 'GET',
+  dataType: 'json',
+  beforeSend: setHeaderforusername
+})
+.then(showuser)
+.catch(function(err){
+  console.log(err)
+})
+function setHeaderforusername(xhr) {
+xhr.setRequestHeader('user_id', token);
+}
+const uname=document.getElementById('lusername');
+function showuser(user) {
+  console.log(user);
+  console.log(user.username);
+  uname.innerText = user.username
+}
