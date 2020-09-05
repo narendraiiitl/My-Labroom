@@ -1,18 +1,18 @@
 const socket = io("/");
 const peers = {};
 const token = $.cookie("user_id");
-const myPeer = new Peer(token);
+const myPeer = new Peer(undefined);
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
 myVideo.muted = true;
 myVideo.width = "300";
 myVideo.height = "300";
 myVideo.controls = true;
+let currentsubject;
 const preload = document.getElementById("prewrapper");
 const attend=document.getElementById('lpresence');
 const Sub=document.getElementById('lsubject');
-let currentsubject;
-$.ajax({
+ $.ajax({
   url: 'http://localhost:3000/api/currentsubject',
   type: 'GET',
   dataType: 'json',
@@ -45,8 +45,7 @@ xhr.setRequestHeader('user_id', token);
 }
 const uname=document.getElementById('lusername');
 function showuser(user) {
-  console.log(user);
-  console.log(user.username);
+  currentusername = user.username
   uname.innerText = user.username
 }
 
@@ -135,11 +134,12 @@ let p=0;
           faceMatcher.findBestMatch(d.descriptor)
         );
         console.log(uname.innerText);
-        if (result[0].label == uname.innerText)
+        if (result[0].label == 'narendra')
         {
           p=p+1;
-          if (p == 20) {
-            // console.log(result[0].label);
+          if (p == 200) {
+            console.log(p)
+            console.log(result[0].label);
             attend.innerText = 'PRESENT'
          axios({
               method: 'post',
@@ -150,6 +150,7 @@ let p=0;
               headers: {'Content-Type': 'application/json;charset=utf-8','authorization':`Bearer ${token}` }
           })
           .then(function (response) {
+            console.log(response)
             attend.innerText = 'PRESENT'
           })
           .catch(function (error) {
@@ -171,13 +172,13 @@ let p=0;
 })
 
   function loadLabeledImages() {
-    const labels = [uname.innerText];
-    console.log(uname.innerText);
+    const labels = ['narendra'];
     return Promise.all(
       labels.map(async (label) => {
         const descriptions = [];
         const img = await faceapi.fetchImage(
-        `http://localhost:3000/image/myimage`
+        // `http://localhost:3000/image/myimage`
+        `https://media-exp1.licdn.com/dms/image/C4E03AQEjeflD2KZJ2Q/profile-displayphoto-shrink_400_400/0?e=1604534400&v=beta&t=8bF97yDG0U5dbk8gF_v8yJ1Dl_jxG6_SJUk8PAtlrJs`
            );
         const detections = await faceapi
           .detectSingleFace(img)
