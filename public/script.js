@@ -26,6 +26,7 @@ function setHeader(xhr) {
 xhr.setRequestHeader('subject_id', ROOM_ID);
 }
 function showsubject(subject) {
+  console.log(subject)
   currentsubject=subject;
   Sub.innerText = subject.name
 }
