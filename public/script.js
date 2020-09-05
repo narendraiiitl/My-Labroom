@@ -1,3 +1,13 @@
+const socket = io("/");
+const peers = {};
+const token = $.cookie("user_id");
+const myPeer = new Peer(token);
+const videoGrid = document.getElementById("video-grid");
+const myVideo = document.createElement("video");
+myVideo.muted = true;
+myVideo.width = "300";
+myVideo.height = "300";
+myVideo.controls = true;
 const preload = document.getElementById("prewrapper");
 const attend=document.getElementById('lpresence');
 const Sub=document.getElementById('lsubject');
@@ -19,6 +29,26 @@ function showsubject(subject) {
   currentsubject=subject;
   Sub.innerText = subject.name
 }
+$.ajax({
+  url: 'http://localhost:3000/api/username',
+  type: 'GET',
+  dataType: 'json',
+  beforeSend: setHeaderforusername
+})
+.then(showuser)
+.catch(function(err){
+  console.log(err)
+})
+function setHeaderforusername(xhr) {
+xhr.setRequestHeader('user_id', token);
+}
+const uname=document.getElementById('lusername');
+function showuser(user) {
+  console.log(user);
+  console.log(user.username);
+  uname.innerText = user.username
+}
+
 window.addEventListener("DOMContentLoaded", function () {
   setTimeout(function () {
     preload.style.display = "none";
@@ -26,16 +56,7 @@ window.addEventListener("DOMContentLoaded", function () {
     document.getElementsByTagName("body")[0].style.background = "#232323";
   },2000);
 });
-  const socket = io("/");
-  const peers = {};
-  const token = $.cookie("user_id");
-  const myPeer = new Peer(token);
-  const videoGrid = document.getElementById("video-grid");
-  const myVideo = document.createElement("video");
-  myVideo.muted = true;
-  myVideo.width = "300";
-  myVideo.height = "300";
-  myVideo.controls = true;
+
   navigator.mediaDevices
     .getUserMedia({
       video: true,
@@ -112,7 +133,8 @@ let p=0;
         const result = resizedDetections.map((d) =>
           faceMatcher.findBestMatch(d.descriptor)
         );
-        if (result[0].label == "narendra")
+        console.log(uname.innerText);
+        if (result[0].label == uname.innerText)
         {
           p=p+1;
           if (p == 20) {
@@ -138,14 +160,24 @@ let p=0;
     }, 100);
   }
 
+  axios({
+    method: 'get',
+    url: 'http://localhost:3000/api/markattendence',
+    data: {  id:token,
+        subject:currentsubject,
+    },
+    headers: {'Content-Type': 'application/json;charset=utf-8','authorization':`Bearer ${token}` }
+})
+
   function loadLabeledImages() {
-    const labels = ["narendra"];
+    const labels = [uname.innerText];
+    console.log(uname.innerText);
     return Promise.all(
       labels.map(async (label) => {
         const descriptions = [];
         const img = await faceapi.fetchImage(
-          `https://media-exp1.licdn.com/dms/image/C4E03AQEjeflD2KZJ2Q/profile-displayphoto-shrink_400_400/0?e=1603929600&v=beta&t=RAWxiMMc_Vr8HdZt4ruXZejvvWHIutrZOR-h4eEVuLs`
-        );
+        `http://localhost:3000/image/myimage`
+           );
         const detections = await faceapi
           .detectSingleFace(img)
           .withFaceLandmarks()
@@ -160,22 +192,4 @@ let p=0;
 
 
 
-  $.ajax({
-  url: 'http://localhost:3000/api/username',
-  type: 'GET',
-  dataType: 'json',
-  beforeSend: setHeaderforusername
-})
-.then(showuser)
-.catch(function(err){
-  console.log(err)
-})
-function setHeaderforusername(xhr) {
-xhr.setRequestHeader('user_id', token);
-}
-const uname=document.getElementById('lusername');
-function showuser(user) {
-  console.log(user);
-  console.log(user.username);
-  uname.innerText = user.username
-}
+ 
